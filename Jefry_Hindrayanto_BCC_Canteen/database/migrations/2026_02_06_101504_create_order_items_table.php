@@ -8,19 +8,20 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('menus', function (Blueprint $table) {
+        Schema::create('order_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('canteen_id')->constrained('canteens')->onDelete('cascade');
-            $table->string('name');
+            $table->foreignId('order_id')->constrained()->onDelete('cascade');
+            $table->foreignId('menu_id')->constrained()->onDelete('cascade');
+
+            $table->integer('quantity');
             $table->integer('price');
-            $table->integer('stock')->default(0);
-            $table->text('description')->nullable();
+
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('menus');
+        Schema::dropIfExists('order_items');
     }
 };
