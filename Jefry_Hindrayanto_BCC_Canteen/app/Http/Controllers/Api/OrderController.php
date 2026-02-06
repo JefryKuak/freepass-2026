@@ -66,7 +66,6 @@ class OrderController extends Controller
                 'message' => 'Order created successfully',
                 'order' => $order->load('items.menu')
             ], 201);
-
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -74,5 +73,34 @@ class OrderController extends Controller
                 'message' => $e->getMessage()
             ], 400);
         }
+    }
+
+    public function pay(Request $request, $id)
+    {
+        $user = $request->user();
+
+        $order = Order::where('id', $id)
+            ->where('user_id', $user->id)
+            ->first();
+
+        if (!$order) {
+            return response()->json([
+                'message' => 'Order not found'
+            ], 404);
+        }
+
+        if ($order->payment_status === 'paid') {
+            return response()->json([
+                'message' => 'Order already paid'
+            ], 400);
+        }
+
+        $order->payment_status = 'paid';
+        $order->save();
+
+        return response()->json([
+            'message' => 'Payment successful',
+            'order' => $order
+        ]);
     }
 }
