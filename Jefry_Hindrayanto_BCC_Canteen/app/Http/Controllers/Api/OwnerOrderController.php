@@ -78,4 +78,39 @@ class OwnerOrderController extends Controller
             'data' => $response
         ]);
     }
+    
+    public function updateStatus(Request $request, $id)
+    {
+        $user = $request->user();
+
+        $validated = $request->validate([
+            'order_status' => 'required|in:waiting,cooking,ready,completed'
+        ]);
+
+        $order = Order::where('id', $id)
+            ->whereHas('canteen', function ($q) use ($user) {
+                $q->where('owner_id', $user->id);
+            })
+            ->first();
+
+        if (!$order) {
+            return response()->json([
+                'message' => 'Order not found for your canteen'
+            ], 404);
+        }
+
+        if ($order->payment_status !== 'paid') {
+            return response()->json([
+                'message' => 'Cannot update order status. Payment not completed.'
+            ], 400);
+        }
+
+        $order->order_status = $validated['order_status'];
+        $order->save();
+
+        return response()->json([
+            'message' => 'Order status updated successfully',
+            'order' => $order
+        ]);
+    }
 }
