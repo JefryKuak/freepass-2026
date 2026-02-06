@@ -41,4 +41,41 @@ class OwnerOrderController extends Controller
             'data' => $orders
         ]);
     }
+
+    public function paymentStatus(Request $request)
+    {
+        $user = $request->user();
+
+        $orders = Order::with('items.menu', 'user')
+            ->whereHas('canteen', function ($q) use ($user) {
+                $q->where('owner_id', $user->id);
+            })
+            ->get();
+
+        $response = $orders->map(function ($order) {
+            return [
+                'order_id' => $order->id,
+                'user' => [
+                    'id' => $order->user->id,
+                    'name' => $order->user->name,
+                    'email' => $order->user->email,
+                ],
+                'total_price' => $order->total_price,
+                'payment_status' => $order->payment_status,
+                'order_status' => $order->order_status,
+                'items' => $order->items->map(function ($item) {
+                    return [
+                        'menu_name' => $item->menu->name,
+                        'quantity' => $item->quantity,
+                        'price' => $item->price
+                    ];
+                })
+            ];
+        });
+
+        return response()->json([
+            'message' => 'Payment status of orders',
+            'data' => $response
+        ]);
+    }
 }

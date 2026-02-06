@@ -33,5 +33,6 @@ Route::middleware(['auth:sanctum', 'role:canteen_owner'])->prefix('canteen_owner
 
     Route::get('/orders/active', [OwnerOrderController::class, 'active']);
     Route::get('/orders/history', [OwnerOrderController::class, 'history']);
-});
 
+    Route::get('/orders/payment-status', [OwnerOrderController::class, 'paymentStatus']);
+});
