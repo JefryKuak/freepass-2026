@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\CanteenController;
 use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\OwnerOrderController;
 use App\Http\Controllers\Api\MenuController;
 
 Route::post('/register', [AuthController::class, 'register']);
@@ -25,8 +26,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/orders/{id}/review', [OrderController::class, 'review']);
 });
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', 'role:canteen_owner'])->prefix('canteen_owner')->group(function () {
     Route::post('/menus', [MenuController::class, 'store']);
     Route::put('/menus/{id}', [MenuController::class, 'update']);
     Route::delete('/menus/{id}', [MenuController::class, 'destroy']);
+
+    Route::get('/orders/active', [OwnerOrderController::class, 'active']);
+    Route::get('/orders/history', [OwnerOrderController::class, 'history']);
 });
+

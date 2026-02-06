@@ -26,7 +26,6 @@ class UserController extends Controller
             'password' => 'nullable|string|min:6|confirmed',
         ]);
 
-        // Update data biasa
         if (isset($validated['name'])) {
             $user->name = $validated['name'];
         }
@@ -39,7 +38,6 @@ class UserController extends Controller
             $user->address = $validated['address'];
         }
 
-        // Update password jika ada
         if (!empty($validated['password'])) {
             $user->password = Hash::make($validated['password']);
         }
