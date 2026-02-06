@@ -103,4 +103,18 @@ class OrderController extends Controller
             'order' => $order
         ]);
     }
+
+    public function myOrders(Request $request)
+    {
+        $user = $request->user();
+
+        $orders = Order::where('user_id', $user->id)
+            ->with('items.menu')
+            ->latest()
+            ->get();
+
+        return response()->json([
+            'orders' => $orders
+        ]);
+    }
 }

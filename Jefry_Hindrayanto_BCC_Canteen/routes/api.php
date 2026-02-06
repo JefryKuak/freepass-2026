@@ -20,4 +20,5 @@ Route::get('/canteens/{id}/menus', [CanteenController::class, 'menus']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/orders', [OrderController::class, 'store']);
     Route::post('/orders/{id}/pay', [OrderController::class, 'pay']);
+    Route::get('/my-orders', [OrderController::class, 'myOrders']);
 });
