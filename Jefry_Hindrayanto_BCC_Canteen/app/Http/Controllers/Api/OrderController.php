@@ -8,6 +8,7 @@ use App\Models\OrderItem;
 use App\Models\Menu;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\Review;
 
 class OrderController extends Controller
 {
@@ -116,5 +117,49 @@ class OrderController extends Controller
         return response()->json([
             'orders' => $orders
         ]);
+    }
+
+    public function review(Request $request, $id)
+    {
+        $user = $request->user();
+
+        $validated = $request->validate([
+            'rating' => 'required|integer|min:1|max:5',
+            'comment' => 'nullable|string'
+        ]);
+
+        $order = Order::where('id', $id)
+            ->where('user_id', $user->id)
+            ->first();
+
+        if (!$order) {
+            return response()->json([
+                'message' => 'Order not found'
+            ], 404);
+        }
+
+        if ($order->order_status !== 'completed') {
+            return response()->json([
+                'message' => 'Order not completed yet'
+            ], 400);
+        }
+
+        if ($order->review) {
+            return response()->json([
+                'message' => 'Review already exists'
+            ], 400);
+        }
+
+        $review = Review::create([
+            'order_id' => $order->id,
+            'user_id' => $user->id,
+            'rating' => $validated['rating'],
+            'comment' => $validated['comment'] ?? null,
+        ]);
+
+        return response()->json([
+            'message' => 'Review submitted',
+            'review' => $review
+        ], 201);
     }
 }

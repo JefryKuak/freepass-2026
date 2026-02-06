@@ -28,4 +28,9 @@ class Order extends Model
     {
         return $this->belongsTo(Canteen::class);
     }
+
+    public function review()
+    {
+        return $this->hasOne(Review::class);
+    }
 }
